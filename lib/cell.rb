@@ -1,7 +1,8 @@
 puts "Cell included"
 
 class Cell
-  STATES = ["x", "."]
+  ALIVE_CELL = "x"
+  DEAD_CELL = "."
   attr_reader :state
   
   def initialize(state)
@@ -13,15 +14,15 @@ class Cell
   end
   
   def toggle_state
-    if @state == STATES[0]
-      @state = STATES[1]
+    if @state == ALIVE_CELL
+      @state = DEAD_CELL
     else
-      @state = STATES[0]
+      @state = ALIVE_CELL
     end
   end
   
   def alive?
-    if @state == "x"
+    if @state == ALIVE_CELL
       return true
     else
       return false
@@ -32,7 +33,7 @@ class Cell
   
   def verify_state(state)
     case state
-    when STATES.include?(state)
+    when ALIVE_CELL || DEAD_CELL
       return state
     else
       raise "Unknown state"
