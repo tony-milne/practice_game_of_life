@@ -1,8 +1,7 @@
 require "./lib/cell.rb"
-#require "./lib/grid.rb"
 
 class Life
-  attr_accessor :grid
+  attr_reader :grid
   
   def initialize(data)
     @grid = convert_to_grid_with_cells(data)
@@ -16,33 +15,26 @@ class Life
     #   if 3 neighbours, live cell stays alive
     
     new_grid = []
-    h = Hash.new
-    row_num = 0 # y
+    dead_neighbours_hash = Hash.new # to contain hash of dead cells (key) with
+                                    # live neighbours (value)
+    row_num = 0
     @grid.each do |r|
       new_row = []
-      col_num = 0 # x
+      col_num = 0
       r.each do |c|
         if c.alive?
           # check live neighbours to see if cell should die of overcrowding or
           # isolation
           num_alive = check_live_neighbours(row_num, col_num)
           
-          # check dead neighbours to see if cell should reproduce
+          # get list of dead neighbours to check later on for cell reproduction
           dead_neighbours = get_dead_neighbours(row_num, col_num)
+          dead_neighbours_hash = add_dead_neighbours_to_hash(dead_neighbours, dead_neighbours_hash, row_num, col_num)
           
-          dead_neighbours.each do |c|
-            if h.key? c
-              cells = h[c]
-              cells << [row_num, col_num]
-            else
-              h[c] = [[row_num, col_num]]
-            end
-          end
-          
+          # kills off cell if too many or too few neighbours
           if((num_alive < 2) || (num_alive >= 4))
-            #c.toggle_state #alive toggles to dead
-            #puts c.state
-            new_row << Cell.new(".")
+            new_cell = c.dup
+            new_row << new_cell.toggle_state
           else
             new_row << c
           end
@@ -55,15 +47,49 @@ class Life
       row_num += 1
     end
     
-    h.each do |k, v|
+    # dead cell with 3 live neighbours reproduces
+    new_grid = set_reproduced_cells(dead_neighbours_hash, new_grid)
+    
+    # overwrite old grid state
+    @grid = new_grid
+  end
+  
+  def get_grid
+    ret_grid = []
+    @grid.each do |r|
+      row = []
+      r.each do |c|
+        row << c.state
+      end
+      ret_grid << row
+    end
+    return ret_grid
+  end
+  
+  private
+  
+  def add_dead_neighbours_to_hash(dead_neighbours, dead_neighbours_hash, cur_row, cur_col)
+    dead_neighbours.each do |coord|
+      if dead_neighbours_hash.key? coord
+        cells = dead_neighbours_hash[coord]
+        cells << [cur_row, cur_col]
+      else
+        dead_neighbours_hash[coord] = [[cur_row, cur_col]]
+      end
+    end
+    return dead_neighbours_hash
+  end
+  
+  def set_reproduced_cells(dead_neighbours_hash, grid)
+    dead_neighbours_hash.each do |k, v|
       if v.length == 3
         row = k[0]
         col = k[1]
-        new_grid[row][col] = Cell.new("x")
+        c = grid[row][col]
+        c.toggle_state
       end
     end
-    
-    @grid = new_grid
+    return grid
   end
   
   def check_live_neighbours(row, col)
@@ -134,12 +160,6 @@ class Life
       grid << row
     end 
     return grid
-  end
-  
-  # if grid array of cells cannot be compared, return grid
-  # containing array of charaters (strings)
-  def get_grid
-    #TODO
   end
   
 end
