@@ -23,7 +23,8 @@ class Life
       r.each do |c|
         if c.alive?
           #check neighbours
-          num_alive = num_of_alive_neighbours(row_num, col_num)#(x,y)
+          num_alive = check_live_neighbours(row_num, col_num)
+          dead_neighbours = get_dead_neighbours
           
           if((num_alive < 2) || (num_alive >= 4))
             #c.toggle_state #alive toggles to dead
@@ -43,60 +44,62 @@ class Life
     @grid = new_grid
   end
   
-  def num_of_alive_neighbours(row, col)
+  def check_live_neighbours(row, col)
     num_alive = 0
-    if (row-1) >= 0
-      c = @grid[row-1][col]
-      if c.alive?
+    check_neighbours(row, col) do
+      if @c.alive?
         num_alive += 1
       end
+    end
+    return num_alive
+  end
+  
+  def get_dead_neighbours(row, col)
+    dead_cells = []
+    check_neighbours(row, col) do
+      if !@c.alive?
+        dead_cells << @c
+      end
+    end
+    return dead_cells
+  end
+  
+  def check_neighbours(row, col)
+    if (row-1) >= 0
+      @c = @grid[row-1][col]
+      yield
       if (col-1) >= 0
-        c = @grid[row-1][col-1]
-        if c.alive?
-          num_alive += 1
-        end
+        @c = @grid[row-1][col-1]
+        yield
       end
       if (col+1) < @grid[0].length
-        c = @grid[row-1][col+1]
-        if c.alive?
-          num_alive += 1
-        end
+        @c = @grid[row-1][col+1]
+        yield
       end
     end
     
     if (col-1) >= 0
-      c = @grid[row][col-1]
-      if c.alive?
-        num_alive += 1
-      end
+      @c = @grid[row][col-1]
+      yield
     end
     
     if (col+1) < @grid[0].length
-      c = @grid[row][col+1]
-      if c.alive?
-        num_alive += 1
-      end
+      @c = @grid[row][col+1]
+      yield
     end
     
     if (row+1) < @grid.length
-      c = @grid[row+1][col]
-      if c.alive?
-        num_alive += 1
-      end
+      @c = @grid[row+1][col]
+      yield
       if (col-1) >= 0
-        c = @grid[row+1][col-1]
-        if c.alive?
-          num_alive += 1
-        end
+        @c = @grid[row+1][col-1]
+        yield
       end
       if (col+1) < @grid[0].length
-        c = @grid[row+1][col+1]
-        if c.alive?
-          num_alive += 1
-        end
+        @c = @grid[row+1][col+1]
+        yield
       end
     end
-    return num_alive
   end
   
   def convert_to_grid_with_cells(data)
