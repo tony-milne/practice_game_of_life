@@ -8,11 +8,10 @@ class Life
   end
   
   def tick
-    # iterate through each cell
-    #   if less than 2 neighbours, cell dies
-    #   if more than 3 neighbours, cell dies
-    #   if 3 neighbours, empty cell comes to life
-    #   if 3 neighbours, live cell stays alive
+    # if less than 2 neighbours, cell dies
+    # if more than 3 neighbours, cell dies
+    # if 3 neighbours, empty cell comes to life
+    # if 3 neighbours, live cell stays alive
     
     new_grid = []
     dead_neighbours_hash = Hash.new # to contain hash of dead cells (key) with
@@ -68,6 +67,7 @@ class Life
   
   private
   
+  # populates hash with record of which live cells are next to a given dead cell
   def add_dead_neighbours_to_hash(dead_neighbours, dead_neighbours_hash, cur_row, cur_col)
     dead_neighbours.each do |coord|
       if dead_neighbours_hash.key? coord
@@ -80,6 +80,8 @@ class Life
     return dead_neighbours_hash
   end
   
+  # given a hash of dead cells with live neighbours, if 3 live neighbours,
+  # changes dead cell to live cell
   def set_reproduced_cells(dead_neighbours_hash, grid)
     dead_neighbours_hash.each do |k, v|
       if v.length == 3
