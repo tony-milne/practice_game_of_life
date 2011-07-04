@@ -1,5 +1,3 @@
-puts "Grid included"
-
 # Remove h & w later on
 class Grid
   def initialize(height=nil, width=nil, data=nil)

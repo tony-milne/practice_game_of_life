@@ -1,5 +1,3 @@
-puts "Cell included"
-
 class Cell
   ALIVE_CELL = "x"
   DEAD_CELL = "."
@@ -16,8 +14,10 @@ class Cell
   def toggle_state
     if @state == ALIVE_CELL
       @state = DEAD_CELL
+      return self
     else
       @state = ALIVE_CELL
+      return self
     end
   end
   
@@ -33,7 +33,7 @@ class Cell
   
   def verify_state(state)
     case state
-    when ALIVE_CELL || DEAD_CELL
+    when ALIVE_CELL, DEAD_CELL
       return state
     else
       raise "Unknown state"
