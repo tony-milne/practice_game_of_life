@@ -20,6 +20,8 @@ end
 
 Then /^I should see the following board$/ do |table|
   # table is a Cucumber::Ast::Table
-  pending # express the regexp above with the code you wish you had
+  test_grid = table.raw
+  grid = @l.get_grid
+  test_grid.should == grid
 end
 
